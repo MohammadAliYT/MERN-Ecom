@@ -8,6 +8,14 @@ module.exports = (err, req, res, next) => {
     const message = `Resource not found, Invalid : ${err.path}`;
     err = new ErrorHandle(message, 400);
   }
+  // Custom error handling for price validation
+  if (err.name === "ValidationError" && err.errors["price"]) {
+    const message = err.errors["price"].message;
+  } else if (err.name === "ValidationError" && err.errors["price"] <= 0) {
+    const message = "Price cannot be less than zero";
+    err = new ErrorHandle(message, 400);
+  }
+
   res.status(err.statusCode).json({
     success: false,
     error: err.message,

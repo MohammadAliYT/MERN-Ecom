@@ -1,18 +1,28 @@
 const mongoose = require("mongoose");
+const uniqueValidator = require("mongoose-unique-validator");
+
 const ProductSchema = mongoose.Schema({
   name: {
     type: String,
     required: [true, "Please provide a product name"],
-    triim: true,
+    trim: true,
+    unique: true,
   },
   description: {
     type: String,
     required: [true, "Please provide a product description"],
   },
   price: {
-    type: String,
+    type: Number,
+    default: 0,
     required: [true, "Please provide a product price"],
-    maxLength: [8, "price cannot exceed 8 characters"],
+    // minLength: [0, "Price cannot be less than 0"],
+    validate: {
+      validator: function (value) {
+        return typeof value === "number" && value > 0;
+      },
+      message: "Price must be greater than zero",
+    },
   },
   ratings: {
     type: Number,
@@ -38,8 +48,13 @@ const ProductSchema = mongoose.Schema({
   stock: {
     type: Number,
     required: [true, "Please provide a product stock"],
-    maxLength: [4, "Stock cannot exceed 4 characters"],
     default: 1,
+    validate: {
+      validator: function (value) {
+        return typeof value === "number" && value >= 0;
+      },
+      message: "Stock must be greater than zero",
+    },
   },
   numberOfReviews: {
     type: Number,
@@ -66,4 +81,9 @@ const ProductSchema = mongoose.Schema({
     default: Date.now,
   },
 });
+
+ProductSchema.plugin(uniqueValidator, {
+  message: "Error, {PATH} {VALUE} already exists.",
+});
+
 module.exports = mongoose.model("Product", ProductSchema);
