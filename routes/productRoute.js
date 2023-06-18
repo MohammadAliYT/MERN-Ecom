@@ -15,9 +15,10 @@ router
   .route("/products/new")
   .post(isAuthenticatedUser, authorizedRole("admin"), createProduct);
 router
-  .route("/products/:id")
+  .route("/admin/products/:id")
   .put(isAuthenticatedUser, authorizedRole("admin"), updateProduct)
-  .delete(isAuthenticatedUser, authorizedRole("admin"), deleteProduct)
-  .get(getProductDetails);
+  .delete(isAuthenticatedUser, authorizedRole("admin"), deleteProduct);
+
+router.route("/products/:id").get(getProductDetails);
 
 module.exports = router;
