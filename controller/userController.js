@@ -128,7 +128,7 @@ exports.getUserDetails = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
-//Get User PASSOWRD details
+//Update User PASSOWRD details
 exports.updatePassword = catchAsyncErrors(async (req, res, next) => {
   const user = await User.findById(req.user.id).select("+password");
   const isPasswordMatched = await user.comparePassword(req.body.oldPassword);
@@ -184,7 +184,6 @@ exports.updateUserRole = catchAsyncErrors(async (req, res, next) => {
     email: req.body.email,
     role: req.body.role,
   };
-
   const user = await User.findByIdAndUpdate(req.params.id, newUserData, {
     new: true,
     runValidators: true,
@@ -207,6 +206,8 @@ exports.deleteUser = catchAsyncErrors(async (req, res, next) => {
     );
   }
 
-  await user.remove();
-  res.status(200).json({ success: true });
+  // await user.remove();
+  await User.deleteOne({ _id: req.params.id }); // Using deleteOne() to delete the user
+
+  res.status(200).json({ success: true, message: "User deleted successfully" });
 });
