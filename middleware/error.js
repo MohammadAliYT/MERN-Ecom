@@ -9,15 +9,32 @@ module.exports = (err, req, res, next) => {
     err = new ErrorHandler(message, 400);
   }
   // Custom error handling for price validation
-  if (err.name === "ValidationError" && err.errors["price"]) {
-    const message = err.errors["price"].message;
-  } else if (err.name === "ValidationError" && err.errors["price"] <= 0) {
-    const message = "Price cannot be less than zero";
-    err = new ErrorHandler(message, 400);
+  if (err.name === "ValidationError") {
+    const errorFields = Object.keys(err.errors);
+    const errorMessages = [];
+
+    errorFields.forEach((field) => {
+      if (field.includes(".")) {
+        const [arrayField, index, subField] = field.split(".");
+        if (
+          subField === "minQuantity" ||
+          subField === "maxQuantity" ||
+          subField === "price"
+        ) {
+          const errorMessage = `At ${arrayField}[${index}], ${err.errors[field].message}`;
+          errorMessages.push(errorMessage);
+        }
+      }
+    });
+
+    if (errorMessages.length > 0) {
+      const message = errorMessages.join("; "); // Join error messages with a separator
+      err = new ErrorHandler(message, 400);
+    }
   }
 
-  //Mongoose duplicate key error
   if (err.code === 11000) {
+    //Mongoose duplicate key error
     const message = `Duplicate ${Object.keys(err.keyValue)} entered`;
     err = new ErrorHandler(message, 400);
   }
