@@ -5,6 +5,7 @@ const connectDatabase = require("./database/dbConnect");
 connectDatabase();
 
 const server = app.listen(process.env.PORT, () => {
+  console.log("CORS enabled");
   console.log(`listening on port http://localhost:${process.env.PORT}`);
 });
 
