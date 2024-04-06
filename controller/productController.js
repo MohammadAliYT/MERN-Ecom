@@ -24,7 +24,7 @@ exports.getAllProducts = catchAsyncErrors(async (req, res, next) => {
     .filter()
     .pagination(resultPerPage);
   const product = await apiFeature.query;
-  res.status(200).json({ success: true, product, productCount });
+  res.status(200).json({ success: true, product, productCount, resultPerPage });
 });
 
 //Update a Product --admin
